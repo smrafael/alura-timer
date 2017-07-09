@@ -1,21 +1,24 @@
 const moment = require('moment');
-let segundos;
+const { ipcRenderer } = require('electron');
+let seconds;
 let timer;
 
 module.exports = {
-    iniciar(el) {
-        let tempo = moment.duration(el.textContent);
-        segundos = tempo.asSeconds();
+    play(el) {
+        let time = moment.duration(el.textContent);
+        seconds = time.asSeconds();
         clearInterval(timer);
         timer = setInterval(() => {
-            segundos++
-            el.textContent = this.segundosParaTempo(segundos);
+            seconds++
+            el.textContent = this.secondsToTime(seconds);
         }, 1000);
     },
-    parar() { 
+    stop(course) {
+        let studiedTime = this.secondsToTime(seconds);
+        ipcRenderer.send('curso-parado', course, studiedTime)
         clearInterval(timer);
     },
-    segundosParaTempo() {
-        return moment().startOf('day').seconds(segundos).format("HH:mm:ss");
+    secondsToTime() {
+        return moment().startOf('day').seconds(seconds).format("HH:mm:ss");
     }
 }

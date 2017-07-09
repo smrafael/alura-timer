@@ -1,4 +1,5 @@
 const { app, BrowserWindow, ipcMain } = require('electron');
+const data = require('./data.js')
 
 app.on('ready', () => {
     console.log('Application is running...');    
@@ -14,22 +15,32 @@ app.on('window-all-closed', () => {
     app.quit();
 });
 
-let sobreWindow = null;
+let aboutWindow = null;
 ipcMain.on('abrir-janela-sobre', () => {
-    if (sobreWindow == null) {
-        sobreWindow = new BrowserWindow({
+    if (aboutWindow == null) {
+        aboutWindow = new BrowserWindow({
             width: 300,
             height: 220,
             alwaysOnTop: true,
             frame: false
         });
-        sobreWindow.on('closed', () => {
-            sobreWindow = null;
+        aboutWindow.on('closed', () => {
+            aboutWindow = null;
         });
     }
-    sobreWindow.loadURL(`file://${__dirname}/app/sobre.html`);
+    aboutWindow.loadURL(`file://${__dirname}/app/sobre.html`);
 });
 
 ipcMain.on('fechar-janela-sobre', () => {
-    sobreWindow.close();
+    aboutWindow.close();
 });
+
+ipcMain.on('curso-parado', (event, course, studiedTime) => {
+    data.saveStudiedTime(course, studiedTime);
+});
+
+ipcMain.on('tempo-do-curso', (ev, course, callback) => {
+    data.getStudiedTime(course, (err, studiedTime) => {
+        ev.sender.send('tempo-do-curso-resposta', studiedTime)
+    });
+})

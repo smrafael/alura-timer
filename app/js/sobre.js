@@ -1,15 +1,15 @@
 const { ipcRenderer, shell } = require('electron');
-    const process = require('process');
+const process = require('process');
 
-let linkFechar = document.querySelector("#link-fechar");
+let linkClose = document.querySelector("#link-fechar");
 let linkTwitter = document.querySelector("#link-twitter");
-let versaoElectron = document.querySelector('#versao-electron');
+let electronVersion = document.querySelector('#versao-electron');
 
 window.onload = function(){
-    versaoElectron.textContent = process.versions.electron;
+    electronVersion.textContent = process.versions.electron;
 }
 
-linkFechar.addEventListener('click', function () {
+linkClose.addEventListener('click', function () {
     ipcRenderer.send('fechar-janela-sobre');
 })
 

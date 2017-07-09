@@ -1,22 +1,30 @@
 const { ipcRenderer } = require('electron');
 const timer = require('./timer');
 
-let linkSobre = document.querySelector('#link-sobre');
-linkSobre.addEventListener('click' , function(){
+let time = document.querySelector('.tempo');
+let course = document.querySelector('.curso');
+window.onload = function() {
+    ipcRenderer.send('tempo-do-curso', course.textContent);
+    ipcRenderer.once('tempo-do-curso-resposta', (ev, studiedTime) => {
+        time.textContent = studiedTime;
+    });
+};
+
+let linkAbout = document.querySelector('#link-sobre');
+linkAbout.addEventListener('click' , function(){
     ipcRenderer.send('abrir-janela-sobre');
 });
 
 let imgs = ['img/play-button.svg', 'img/stop-button.svg'];
-let botaoPlay = document.querySelector('.botao-play');
-let tempo = document.querySelector('.tempo');
+let buttonPlay = document.querySelector('.botao-play');
 let play = false;
-botaoPlay.addEventListener('click', () => {
+buttonPlay.addEventListener('click', () => {
     if (play) {
-        timer.parar();
+        timer.stop(course.textContent);
     } else {
-        timer.iniciar(tempo);
+        timer.play(time);
     }
     play = !play;
     imgs.reverse();
-    botaoPlay.src = imgs[0];
+    buttonPlay.src = imgs[0];
 });
