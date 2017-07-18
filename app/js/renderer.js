@@ -32,3 +32,12 @@ buttonPlay.addEventListener("click", () => {
   imgs.reverse();
   buttonPlay.src = imgs[0];
 });
+
+let addButton = document.querySelector('.botao-adicionar');
+let addInput = document.querySelector('.campo-adicionar');
+addButton.addEventListener('click', () => {
+  courseEl.textContent = addInput.value;
+  timeEl.textContent = '00:00:00';
+  addInput.value = null;
+  ipcRenderer.send('course-added', courseEl.textContent);
+})
