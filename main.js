@@ -1,56 +1,55 @@
-const { app, BrowserWindow, ipcMain, Tray, Menu } = require('electron');
-const data = require('./data.js')
+const { app, BrowserWindow, ipcMain, Tray, Menu } = require("electron");
+const data = require("./data.js");
+const trayMenuTemplate = require("./tray-menu-template.js");
 
 let tray = null;
-let trayMenu = 
-app.on('ready', () => {
-    console.log('Application is running...');    
-    let mainWindow = new BrowserWindow({
-        width: 600,
-        height: 400
-    });
-    
-    trayMenu = Menu.buildFromTemplate([
-        {label: 'Curso #1', type: 'radio'},
-        {label: 'Curso #2', type: 'radio'},
-    ]);
-    
-    tray = new Tray(__dirname + '/app/img/icon-tray.png')
-    tray.setContextMenu(trayMenu);
+app.on("ready", () => {
+  console.log("Application is running...");
+  let mainWindow = new BrowserWindow({
+    width: 600,
+    height: 400
+  });
 
-    mainWindow.loadURL(`file://${__dirname}/app/index.html`);
+  let trayMenu = Menu.buildFromTemplate(
+    trayMenuTemplate.getTemplate(mainWindow)
+  );
+
+  tray = new Tray(__dirname + "/app/img/icon-tray.png");
+  tray.setContextMenu(trayMenu);
+
+  mainWindow.loadURL(`file://${__dirname}/app/index.html`);
 });
 
-app.on('window-all-closed', () => {
-    app.quit();
+app.on("window-all-closed", () => {
+  app.quit();
 });
 
 let aboutWindow = null;
-ipcMain.on('abrir-janela-sobre', () => {
-    if (aboutWindow == null) {
-        aboutWindow = new BrowserWindow({
-            width: 300,
-            height: 220,
-            alwaysOnTop: true,
-            frame: false
-        });
-        aboutWindow.on('closed', () => {
-            aboutWindow = null;
-        });
-    }
-    aboutWindow.loadURL(`file://${__dirname}/app/sobre.html`);
-});
-
-ipcMain.on('fechar-janela-sobre', () => {
-    aboutWindow.close();
-});
-
-ipcMain.on('curso-parado', (event, course, studiedTime) => {
-    data.saveStudiedTime(course, studiedTime);
-});
-
-ipcMain.on('tempo-do-curso', (ev, course, callback) => {
-    data.getStudiedTime(course, (err, studiedTime) => {
-        ev.sender.send('tempo-do-curso-resposta', studiedTime)
+ipcMain.on("abrir-janela-sobre", () => {
+  if (aboutWindow == null) {
+    aboutWindow = new BrowserWindow({
+      width: 300,
+      height: 220,
+      alwaysOnTop: true,
+      frame: false
     });
-})
+    aboutWindow.on("closed", () => {
+      aboutWindow = null;
+    });
+  }
+  aboutWindow.loadURL(`file://${__dirname}/app/sobre.html`);
+});
+
+ipcMain.on("fechar-janela-sobre", () => {
+  aboutWindow.close();
+});
+
+ipcMain.on("curso-parado", (event, course, studiedTime) => {
+  data.saveStudiedTime(course, studiedTime);
+});
+
+ipcMain.on("tempo-do-curso", (ev, course, callback) => {
+  data.getStudiedTime(course, (err, studiedTime) => {
+    ev.sender.send("tempo-do-curso-resposta", studiedTime);
+  });
+});
