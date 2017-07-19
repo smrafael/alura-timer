@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain, Tray, Menu } = require("electron");
+const { app, BrowserWindow, ipcMain, Tray, Menu, globalShortcut } = require("electron");
 const data = require("./data.js");
 const templates = require("./templates.js");
 
@@ -18,6 +18,11 @@ app.on("ready", () => {
   let trayMenu = Menu.buildFromTemplate(templates.getTrayTemplate(mainWindow));
   tray = new Tray(__dirname + "/app/img/icon-tray.png");
   tray.setContextMenu(trayMenu);
+
+  // Global Shortcuts
+  globalShortcut.register("CommandOrControl+Shift+S", () => {
+    mainWindow.send("play-stop-time");
+  });
 
   mainWindow.loadURL(`file://${__dirname}/app/index.html`);
 });

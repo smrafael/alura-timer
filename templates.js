@@ -43,6 +43,7 @@ module.exports = {
         submenu: [
           {
             label: "About",
+            accelerator: "CmdOrCtrl+I",
             click: () => {
               ipcMain.emit("abrir-janela-sobre");
             }
