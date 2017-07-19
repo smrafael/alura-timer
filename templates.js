@@ -1,8 +1,9 @@
+const { app, ipcMain } = require("electron");
 const data = require("./data.js");
 let template = null;
 
 module.exports = {
-  getTemplate(mainWindow) {
+  getTrayTemplate(mainWindow) {
     template = [{ label: "Cursos" }, { type: "separator" }];
 
     let courses = data.getCourses();
@@ -34,5 +35,26 @@ module.exports = {
     };
     template.push(menuItem);
     return template;
+  },
+  getMenuTemplate() {
+    let menuTemplate = [
+      {
+        label: "Help",
+        submenu: [
+          {
+            label: "About",
+            click: () => {
+              ipcMain.emit("abrir-janela-sobre");
+            }
+          }
+        ]
+      }
+    ];
+    if (process.platform === "darwin") {
+      menuTemplate.unshift({
+        label: app.getName()
+      });
+    }
+    return menuTemplate;
   }
 };

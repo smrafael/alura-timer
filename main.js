@@ -1,20 +1,21 @@
 const { app, BrowserWindow, ipcMain, Tray, Menu } = require("electron");
 const data = require("./data.js");
-const trayMenuTemplate = require("./tray-menu-template.js");
+const templates = require("./templates.js");
 
 let tray = null;
 let mainWindow = null;
 app.on("ready", () => {
-  console.log("Application is running...");
   mainWindow = new BrowserWindow({
     width: 600,
     height: 400
   });
 
-  let trayMenu = Menu.buildFromTemplate(
-    trayMenuTemplate.getTemplate(mainWindow)
-  );
+  // Menu
+  let menu = Menu.buildFromTemplate(templates.getMenuTemplate());
+  Menu.setApplicationMenu(menu);
 
+  // Tray Menu
+  let trayMenu = Menu.buildFromTemplate(templates.getTrayTemplate(mainWindow));
   tray = new Tray(__dirname + "/app/img/icon-tray.png");
   tray.setContextMenu(trayMenu);
 
@@ -41,24 +42,24 @@ ipcMain.on("abrir-janela-sobre", () => {
   aboutWindow.loadURL(`file://${__dirname}/app/sobre.html`);
 });
 
-ipcMain.on('fechar-janela-sobre', () => {
+ipcMain.on("fechar-janela-sobre", () => {
   aboutWindow.close();
 });
 
-ipcMain.on('curso-parado', (event, course, studiedTime) => {
+ipcMain.on("curso-parado", (event, course, studiedTime) => {
   data.saveStudiedTime(course, studiedTime);
 });
 
-ipcMain.on('tempo-do-curso', (ev, course, callback) => {
+ipcMain.on("tempo-do-curso", (ev, course, callback) => {
   data.getStudiedTime(course, (err, studiedTime) => {
     ev.sender.send("tempo-do-curso-resposta", studiedTime);
   });
 });
 
-ipcMain.on('course-added', (ev, course) => {
-  data.saveStudiedTime(course, '00:00:00');
+ipcMain.on("course-added", (ev, course) => {
+  data.saveStudiedTime(course, "00:00:00");
   let trayMenu = Menu.buildFromTemplate(
-    trayMenuTemplate.addCourseToTemplate(course, mainWindow)
+    templates.addCourseToTemplate(course, mainWindow)
   );
   tray.setContextMenu(trayMenu);
 });
