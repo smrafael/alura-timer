@@ -10,6 +10,10 @@ window.onload = function() {
     timeEl.textContent = studiedTime;
   });
   ipcRenderer.on("course-changed", (ev, course, timeStudied) => {
+    if (play) {
+      stop();
+      tooglePlayStop();
+    }
     courseEl.textContent = course;
     timeEl.textContent = timeStudied;
   });
@@ -28,20 +32,14 @@ let imgs = ["img/play-button.svg", "img/stop-button.svg"];
 let play = false;
 buttonPlay.addEventListener("click", () => {
   if (play) {
-    timer.stop(courseEl.textContent);
-    new Notification("Alura Timer", {
-      body: `The course ${courseEl.textContent} was stopped!
-Time: ${timeEl.textContent}`
-    });
+    stop();
   } else {
     timer.play(timeEl);
     new Notification("Alura Timer", {
       body: `The course ${courseEl.textContent} was started!`
     });
   }
-  play = !play;
-  imgs.reverse();
-  buttonPlay.src = imgs[0];
+  tooglePlayStop();
 });
 
 let addButton = document.querySelector(".botao-adicionar");
@@ -52,3 +50,17 @@ addButton.addEventListener("click", () => {
   addInput.value = null;
   ipcRenderer.send("course-added", courseEl.textContent);
 });
+
+function stop () {
+  timer.stop(courseEl.textContent);
+    new Notification("Alura Timer", {
+      body: `The course ${courseEl.textContent} was stopped!
+Time: ${timeEl.textContent}`
+    });
+}
+
+function tooglePlayStop()  {
+  play = !play;
+  imgs.reverse();
+  buttonPlay.src = imgs[0];
+}
